@@ -1,0 +1,76 @@
+"""Command line interface for roof area workflows."""
+
+from __future__ import annotations
+
+import argparse
+from typing import Sequence
+
+from roof_area.config import RoofAreaSettings
+from roof_area.logging import configure_logging
+
+
+def _add_common_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--threshold", type=float, help="Probability threshold")
+    parser.add_argument("--tile-size", type=int, help="Tile size in pixels")
+    parser.add_argument("--overlap", type=int, help="Tile overlap in pixels")
+    parser.add_argument("--min-area-m2", type=float, help="Minimum roof area in m²")
+    parser.add_argument("--seed", type=int, help="Random seed")
+    parser.add_argument("--log-level", type=str, help="Logging level")
+
+
+def _build_settings(args: argparse.Namespace) -> RoofAreaSettings:
+    data = {k: v for k, v in vars(args).items() if v is not None}
+    return RoofAreaSettings(**data)
+
+
+def _infer_command(args: argparse.Namespace) -> int:
+    settings = _build_settings(args)
+    logger = configure_logging(settings.log_level, "roof_area.infer")
+    logger.info("Running inference with settings: %s", settings.model_dump())
+    logger.info("TODO: implement inference pipeline")
+    return 0
+
+
+def _eval_command(args: argparse.Namespace) -> int:
+    settings = _build_settings(args)
+    logger = configure_logging(settings.log_level, "roof_area.eval")
+    logger.info("Running evaluation with settings: %s", settings.model_dump())
+    logger.info("TODO: implement evaluation pipeline")
+    return 0
+
+
+def _train_command(args: argparse.Namespace) -> int:
+    settings = _build_settings(args)
+    logger = configure_logging(settings.log_level, "roof_area.train")
+    logger.info("Running training with settings: %s", settings.model_dump())
+    logger.info("TODO: implement training pipeline")
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="roof-area", description="Roof area pipeline")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    infer_parser = subparsers.add_parser("infer", help="Run inference")
+    _add_common_args(infer_parser)
+    infer_parser.set_defaults(func=_infer_command)
+
+    eval_parser = subparsers.add_parser("eval", help="Run evaluation")
+    _add_common_args(eval_parser)
+    eval_parser.set_defaults(func=_eval_command)
+
+    train_parser = subparsers.add_parser("train", help="Run training")
+    _add_common_args(train_parser)
+    train_parser.set_defaults(func=_train_command)
+
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
