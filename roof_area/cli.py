@@ -7,6 +7,7 @@ from typing import Sequence
 
 from roof_area.config import RoofAreaSettings
 from roof_area.logging import configure_logging
+from roof_area.metrics.eval import default_report_path, evaluate_masks, write_report
 from roof_area.model.infer import run_inference
 
 
@@ -46,7 +47,20 @@ def _eval_command(args: argparse.Namespace) -> int:
     settings = _build_settings(args)
     logger = configure_logging(settings.log_level, "roof_area.eval")
     logger.info("Running evaluation with settings: %s", settings.model_dump())
-    logger.info("TODO: implement evaluation pipeline")
+    if not settings.pred_mask_path:
+        raise ValueError("Missing --pred-mask for evaluation.")
+    if not settings.ground_truth_path:
+        raise ValueError("Missing --ground-truth for evaluation.")
+
+    metrics = evaluate_masks(
+        pred_mask_path=settings.pred_mask_path,
+        ground_truth_path=settings.ground_truth_path,
+    )
+    report_path = settings.report_path or default_report_path(
+        settings.pred_mask_path
+    )
+    write_report(metrics, report_path)
+    logger.info("Evaluation report saved to %s", report_path)
     return 0
 
 
@@ -87,6 +101,24 @@ def build_parser() -> argparse.ArgumentParser:
 
     eval_parser = subparsers.add_parser("eval", help="Run evaluation")
     _add_common_args(eval_parser)
+    eval_parser.add_argument(
+        "--pred-mask",
+        dest="pred_mask_path",
+        type=str,
+        help="Predicted mask raster path",
+    )
+    eval_parser.add_argument(
+        "--ground-truth",
+        dest="ground_truth_path",
+        type=str,
+        help="Ground truth vector path",
+    )
+    eval_parser.add_argument(
+        "--report",
+        dest="report_path",
+        type=str,
+        help="Output report markdown path",
+    )
     eval_parser.set_defaults(func=_eval_command)
 
     train_parser = subparsers.add_parser("train", help="Run training")

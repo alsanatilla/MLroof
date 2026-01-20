@@ -25,3 +25,8 @@ class RoofAreaSettings(BaseSettings):
     model_path: str | None = Field(
         None, description="Optional path to a trained ML model"
     )
+    pred_mask_path: str | None = Field(None, description="Path to predicted mask")
+    ground_truth_path: str | None = Field(
+        None, description="Path to ground truth vector data"
+    )
+    report_path: str | None = Field(None, description="Path to evaluation report")
