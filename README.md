@@ -2,7 +2,7 @@
 
 Utilities for roof area inference, evaluation, and training.
 
-## Setup
+## Setup & Installation
 
 ```bash
 python -m venv .venv
@@ -16,7 +16,7 @@ Optional training dependencies:
 pip install -e '.[train]'
 ```
 
-## CLI
+## CLI-Beispiele
 
 Run inference:
 
@@ -35,3 +35,7 @@ Run training (optional):
 ```bash
 roof-area train --seed 123
 ```
+
+## Legal-Open-Data Hinweis
+
+Die Nutzung von Geobasisdaten der Landesvermessung sowie Daten des Bundesamts fuer Kartographie und Geodaesie (BKG) kann Lizenz- und Nutzungspflichten enthalten. Bitte pruefen Sie die jeweils gueltigen Open-Data-Lizenzen der zustaendigen Stellen, bevor Sie Daten weiterverwenden oder veroeffentlichen.
