@@ -7,6 +7,7 @@ from typing import Sequence
 
 from roof_area.config import RoofAreaSettings
 from roof_area.logging import configure_logging
+from roof_area.model.infer import run_inference
 
 
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
@@ -27,7 +28,17 @@ def _infer_command(args: argparse.Namespace) -> int:
     settings = _build_settings(args)
     logger = configure_logging(settings.log_level, "roof_area.infer")
     logger.info("Running inference with settings: %s", settings.model_dump())
-    logger.info("TODO: implement inference pipeline")
+    if not settings.raster_path:
+        raise ValueError("Missing --raster for inference.")
+
+    run_inference(
+        raster_path=settings.raster_path,
+        footprints_path=settings.footprints_path,
+        output_path=settings.output_path,
+        model_path=settings.model_path,
+        threshold=settings.threshold,
+        logger=logger,
+    )
     return 0
 
 
@@ -53,6 +64,25 @@ def build_parser() -> argparse.ArgumentParser:
 
     infer_parser = subparsers.add_parser("infer", help="Run inference")
     _add_common_args(infer_parser)
+    infer_parser.add_argument("--raster", dest="raster_path", type=str, help="Input raster path")
+    infer_parser.add_argument(
+        "--footprints",
+        dest="footprints_path",
+        type=str,
+        help="Building footprint vector path",
+    )
+    infer_parser.add_argument(
+        "--output",
+        dest="output_path",
+        type=str,
+        help="Output mask path (GeoTIFF)",
+    )
+    infer_parser.add_argument(
+        "--model",
+        dest="model_path",
+        type=str,
+        help="Optional model path to enable ML inference",
+    )
     infer_parser.set_defaults(func=_infer_command)
 
     eval_parser = subparsers.add_parser("eval", help="Run evaluation")
