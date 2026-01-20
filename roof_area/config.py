@@ -17,3 +17,11 @@ class RoofAreaSettings(BaseSettings):
     min_area_m2: float = Field(5.0, ge=0.0, description="Minimum roof area in m²")
     seed: int = Field(42, description="Random seed")
     log_level: str = Field("INFO", description="Logging level")
+    raster_path: str | None = Field(None, description="Path to input raster")
+    footprints_path: str | None = Field(
+        None, description="Path to building footprint vector data"
+    )
+    output_path: str | None = Field(None, description="Path to output mask raster")
+    model_path: str | None = Field(
+        None, description="Optional path to a trained ML model"
+    )
