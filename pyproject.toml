@@ -1,0 +1,28 @@
+[project]
+name = "roof-area"
+version = "0.1.0"
+description = "Roof area inference pipeline"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "MLroof"}]
+dependencies = [
+  "rasterio",
+  "numpy",
+  "opencv-python",
+  "shapely",
+  "geopandas",
+  "pyproj",
+  "pydantic>=2",
+  "pydantic-settings>=2",
+]
+
+[project.optional-dependencies]
+train = ["torch"]
+
+[project.scripts]
+roof-area = "roof_area.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["roof_area*"]
